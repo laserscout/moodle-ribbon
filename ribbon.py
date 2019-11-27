@@ -8,12 +8,12 @@ import contextlib
 import argparse
 from pathlib import Path
 import copy
-
 import random
-import subprocess
 import os
-from coderunnertest.xmlGenerator import xmlCodeRunner
+from coderunner.xmlGenerator import xmlCodeRunner
 
+# extra imports, useful for generator functions
+import subprocess
 import datetime
 import random
 import locale
