@@ -46,6 +46,11 @@ Frank Blanning<sup>1</sup>,
 Dimitris Floros<sup>1</sup>,
 Nikos Pitsianis<sup>1</sup>.
 
+
+*Communication*:\
+Send your questions at {frankgou, fcdimitr} @auth.gr\
+or [open a new issue](https://github.com/laserscout/moodle-ribbon/issues).
+
 *Acknowledgements*:\
 We thank Xiaobai Sun<sup>2</sup> for her critical comments.
 
