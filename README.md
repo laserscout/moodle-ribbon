@@ -39,7 +39,7 @@ will generate 4 questions based on the template, with names `Q001, ..., Q004` un
 - Initial commit
 - Beta option: Coderunner questions
 
-## Contributors 
+## Author list
 
 *Design and development*:\
 Frank Blanning<sup>1</sup>,
