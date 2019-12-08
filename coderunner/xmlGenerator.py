@@ -58,7 +58,7 @@ class xmlCodeRunner():
             # question text
             questionText = ET.SubElement(question, 'questiontext', attrib={"format": "markdown"})
             text = ET.SubElement(questionText, 'text')
-            text.append( self.CDATA("{}".format(qq["description"]) ) )
+            text.append( self.CDATA("{}".format(qq["description"].replace("\\n\\n","\n\n")) ) )
         
             # [HARD-CODED] multiple options (hard-coded for our needs)
             question = self.addExtraElementWithText(question, 'generalfeedback', '', attrib = {"format": "html"})

@@ -165,7 +165,9 @@ $CATEGORY: {prefix}/{category}
     strQuestion = re.sub(self.regexHeader, '', strQuestion)
     strQuestion = re.sub(self.regexOptions, '', strQuestion, flags=re.M )
 
-    self.questionTemplate = re.sub( "(\n+)", "\n", strQuestion.lstrip().rstrip() )
+    # double or more blanks correspond to \n
+    self.questionTemplate = re.sub( "\n{2,}", "\\\\n\\\\n",
+                                      strQuestion.lstrip().rstrip() )
 
     isXML = self.parseOptions(options)
 
