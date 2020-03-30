@@ -10,6 +10,22 @@ from pathlib import Path
 import copy
 import random
 import os
+import xml.etree.ElementTree as etree
+
+# ..... SETUP ET
+etree._original_serialize_xml = etree._serialize_xml
+def _serialize_xml(write, elem, qnames, namespaces,short_empty_elements, **kwargs):
+  if elem.tag == '![CDATA[':
+    write("\n<{}{}]]>\n".format(elem.tag, elem.text))
+    if elem.tail:
+      write(etree._escape_cdata(elem.tail))
+    else:
+      return etree._original_serialize_xml(write, elem, qnames, namespaces,short_empty_elements, **kwargs)
+
+etree._serialize_xml = etree._serialize['xml'] = _serialize_xml
+
+
+from cloze.xmlGenerator import xmlCloze
 from coderunner.xmlGenerator import xmlCodeRunner
 
 # extra imports, useful for generator functions
@@ -55,7 +71,7 @@ class Question:
     
     self.crDict = qq
     return True
-  
+
   def parseCSV(self, strIn):
 
     if len(strIn) == 0:
@@ -78,9 +94,25 @@ class Question:
     self.variations = dict(enumerate(list(reader)))
     return False
 
+  def parseCloze(self, strIn):
+
+    qq = {}
+
+    # put category, name, and description
+    qq["name"] = "Q001"
+    qq["category"] = "{}/{}".format(self.prefix, self.category)
+    qq["description"] = self.questionTemplate
+
+    self.clozeDict = qq
+    
+    self.parseCSV(strIn)
+    return False
+  
+  
   availOptions = {
     "csv": parseCSV,
-    "cr": coderunner
+    "cr": coderunner,
+    "cloze": parseCloze
   }
   
   def __init__(self, strQuestion, prefix = "", outputdir = "./"):
@@ -122,6 +154,28 @@ class Question:
       qqList.append(temp)
       
     xmlCodeRunner(qqList, file_to_open)
+
+  def buildCloze(self):
+    qq = self.clozeDict
+    
+    data_folder = Path(self.outputdir)
+    file_name = qq["category"].replace("/", "_") + ".xml"
+    file_to_open = data_folder / file_name
+
+    qqList = []
+
+    for idx, variation in self.variations.items():
+      temp = copy.deepcopy(qq)
+
+      for varName, varValue in variation.items():
+        varName = varName.strip()
+        varValue = varValue.strip()
+        temp["description"] = temp["description"].replace("{{" + varName + "}}", varValue)
+        
+      temp["name"] = "Q{idx:03d}".format(idx = idx + 1)
+      qqList.append(temp)
+        
+    xmlCloze(qqList, file_to_open)
     
   def buildQuestions(self):
     
@@ -148,15 +202,21 @@ $CATEGORY: {prefix}/{category}
       self.gifts.append(gift)
       
   def parseOptions(self, options):
-    isXML = False
+    isCR = False
+    isCloze = False
     for option in options:
+      if option[0] == "cloze":
+        isCloze = True
+      if option[0] == "cr":
+        isCR = True
+
       func = self.availOptions.get(option[0])
       if func is not None:
-        isXML |= func( self, option[1] )
+        func( self, option[1] )
       else:
         print( "Unknown option {}, skipping...".format(option[0]))
 
-    return isXML
+    return isCR, isCloze
         
   def parseString(self, strQuestion):
     self.category = re.search( self.regexHeader, strQuestion ).group(1)
@@ -168,14 +228,22 @@ $CATEGORY: {prefix}/{category}
     # double or more blanks correspond to \n
     self.questionTemplate = re.sub( "\n{2,}", "\\\\n\\\\n",
                                       strQuestion.lstrip().rstrip() )
-
-    isXML = self.parseOptions(options)
-
-    if isXML:
-      print("Printed XML")
+    
+    isCR, isCloze = self.parseOptions(options)
+    
+    if isCR:
+      print("Printing CodeRunner")
       self.buildCodeRunner()
 
+    elif isCloze:
+      print("Printing Cloze")
+      self.buildCloze()
+      
     else:
+      # if whitespaces at beginning, keep them
+      self.questionTemplate = re.sub( r'\n(\s+)', r'\\n\1',
+                                      self.questionTemplate )
+
       self.buildQuestions()
 
     
