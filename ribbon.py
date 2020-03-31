@@ -10,19 +10,18 @@ from pathlib import Path
 import copy
 import random
 import os
-import xml.etree.ElementTree as etree
 
-# ..... SETUP ET
-etree._original_serialize_xml = etree._serialize_xml
-def _serialize_xml(write, elem, qnames, namespaces,short_empty_elements, **kwargs):
-  if elem.tag == '![CDATA[':
-    write("\n<{}{}]]>\n".format(elem.tag, elem.text))
-    if elem.tail:
-      write(etree._escape_cdata(elem.tail))
-    else:
-      return etree._original_serialize_xml(write, elem, qnames, namespaces,short_empty_elements, **kwargs)
+import xml.etree.ElementTree as ET
+# ============================== hack for CDATA
 
-etree._serialize_xml = etree._serialize['xml'] = _serialize_xml
+def serialize_xml_with_CDATA(write, elem, qnames, namespaces, short_empty_elements, **kwargs):
+  if elem.tag == 'CDATA':
+    write("<![CDATA[{}]]>".format(elem.text))
+    return
+  return ET._original_serialize_xml(write, elem, qnames, namespaces, short_empty_elements, **kwargs)
+
+ET._original_serialize_xml = ET._serialize_xml
+ET._serialize_xml = ET._serialize['xml'] = serialize_xml_with_CDATA
 
 
 from cloze.xmlGenerator import xmlCloze
