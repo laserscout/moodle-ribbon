@@ -54,7 +54,6 @@ class xmlCloze():
             question = self.addExtraElement(question, 'penalty', "0.00")
             question = self.addExtraElement(question, 'hidden', "0")
                     
-        print(qqList)
         # create a new XML file with the results
         tree = ET.ElementTree(root)
         myfile = open(outfile, "wb")
