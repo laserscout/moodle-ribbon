@@ -2,6 +2,8 @@
 
 We introduce `Ribbon` a wrapper around Moodle’s `GIFT` format, which enables instructors to compose a quiz in a `Markdown` document, with questions that have multiple versions. The tool accepts templated questions with placeholder strings in the body of the question and a list of multiple values, or a function/routine that generates a list of values. The output is a `GIFT` file containing a question for each variation of the list. This reduces the amount of time needed to create a high quality exam while minimizing students' incentive for copying each other.
 
+A presentation explaining the project is available [here](https://github.com/laserscout/moodle-ribbon/blob/master/MOODLEMOOT-2019-RIBBON-main.pdf).
+
 ## Prerequisites
 
 The only dependency of the `Ribbon` module is `Python 3`. All imported packages should be installed in a clean, new `Python 3` installation.
