@@ -224,6 +224,9 @@ $CATEGORY: {prefix}/{category}
     strQuestion = re.sub(self.regexHeader, '', strQuestion)
     strQuestion = re.sub(self.regexOptions, '', strQuestion, flags=re.M )
 
+    # remove any extra options
+    strQuestion = re.sub("^:::.*", '', strQuestion, flags=re.M )
+
     # double or more blanks correspond to \n
     self.questionTemplate = re.sub( "\n{2,}", "\\\\n\\\\n",
                                       strQuestion.lstrip().rstrip() )
@@ -272,6 +275,7 @@ def readQuestionsFromFile(fileName):
   # split by regex
   indices = [m.start(0) for m in re.finditer(reHeaders, content, flags=re.M)]
 
+  # separate questions (based on heading #)
   questions = [content[i:j] for i, j in zip(indices, indices[1:] + [None])]
 
   return questions
