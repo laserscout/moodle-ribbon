@@ -226,6 +226,7 @@ $CATEGORY: {prefix}/{category}
 
     # remove any extra options
     strQuestion = re.sub("^:::.*", '', strQuestion, flags=re.M )
+    strQuestion = re.sub("\(\[\(\[\(.*\)\]\)\]\)", '', strQuestion, flags=re.DOTALL )
 
     # double or more blanks correspond to \n
     self.questionTemplate = re.sub( "\n{2,}", "\\\\n\\\\n",
